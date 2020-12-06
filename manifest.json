@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+  "name": "AoC Private Leaderboard Graphs",
+  "version": "0.1",
+  "content_scripts": [
+    {
+      "matches": [
+        "http://adventofcode.com/*/leaderboard/private/view/*",
+        "https://adventofcode.com/*/leaderboard/private/view/*"
+      ],
+      "js": [
+        "d3.js",
+        "graph.js",
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ]
+    }
+  ],
+  "permissions": [
+    "cookies",
+    "http://adventofcode.com/*/leaderboard/private/view/*",
+    "https://adventofcode.com/*/leaderboard/private/view/*"
+  ]
+}
