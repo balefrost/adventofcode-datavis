@@ -1,13 +1,13 @@
 svg {
 }
 
-svg .axis line {
-    stroke: #ccc;
-}
-
-svg .axis text {
+svg text {
     fill: #ccc;
     font-family: "Source Code Pro", monospace;
+}
+
+svg .axis line {
+    stroke: #ccc;
 }
 
 svg .axis path {
@@ -15,5 +15,5 @@ svg .axis path {
 }
 
 svg .data path {
-    stroke-width: 1.5px;
+    /*stroke-width: 1.5px;*/
 }

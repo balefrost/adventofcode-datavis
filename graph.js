@@ -103,56 +103,54 @@ function buildGraph(svg, jsonData) {
     //     .domain([processedData.minTimestamp, processedData.maxTimestamp])
     //     .range([0, svg.attr('width')]);
 
-    const dataGroup = svg.append('g').classed('data', true);
+    const targetStrokeWidth = 3;
+
+    const marginLeft = 25;
+    const marginBottom = 20;
+    const legendLeftMargin = 5;
+    const legendWidth = 200;
+
+    const defs = svg.append("defs");
+    const graphContentClipPath = defs.append("clipPath").attr("id", "graph-content-clip-path");
+    graphContentClipPath
+        .append("rect")
+        .attr("x", marginLeft)
+        .attr("width", svg.attr('width') - marginLeft - legendLeftMargin - legendWidth)
+        .attr("height", svg.attr('height') - marginBottom);
+
+    const dataContainerGroup = svg.append('g').attr('clip-path', 'url(#graph-content-clip-path)');
+    const dataGroup = dataContainerGroup.append('g').classed('data', true);
+    const legendGroup = svg.append('g').attr('transform', `translate(${svg.attr('width') - legendWidth}, 0)`);
     const xAxisElement = svg.append('g').classed('axis xaxis', true);
     const yAxisElement = svg.append('g').classed('axis yaxis', true);
 
     const starRange = processedData.maxStars - processedData.minStars;
     const scoreRange = processedData.maxScore - processedData.minScore;
 
-    const originalXScale = d3.scaleLinear()
+    const xScale = d3.scaleLinear()
         .domain([processedData.minStars - 0.05 * starRange, processedData.maxStars + 0.05 * starRange])
-        .range([0, svg.attr('width')]);
-    const originalYScale = d3.scaleLinear()
+        .range([marginLeft, svg.attr('width') - legendLeftMargin - legendWidth]);
+    const yScale = d3.scaleLinear()
         .domain([processedData.minScore - 0.05 * scoreRange, processedData.maxScore + 0.05 * scoreRange])
-        .range([svg.attr('height') - 1, 0]);
-    let currentXScale = originalXScale;
-    let currentYScale = originalYScale;
-    const xAxis = d3.axisTop(currentXScale);
-    const yAxis = d3.axisRight(currentYScale);
-
-    const curve = function (context) {
-        let previousY = null;
-        return {
-            lineStart() {
-            },
-            lineEnd() {
-            },
-            point(x, y) {
-                if (previousY != null) {
-                    context.lineTo(x, previousY);
-                }
-                context.moveTo(x, y);
-                previousY = y;
-            }
-        };
-    };
+        .range([svg.attr('height') - marginBottom, 0]);
+    const xAxis = d3.axisBottom(xScale);
+    const yAxis = d3.axisLeft(yScale);
 
     const line = d3.line()
-        // .x(d => currentXScale(d.timestamp))
-            .x((d, idx) => currentXScale(idx))
-            .y(d => currentYScale(d.score))
-        // .curve(d3.curveStepAfter)
-        // .curve(curve)
-    ;
+        .x((d, idx) => xScale(idx))
+        .y(d => yScale(d.score));
 
     function update() {
-        const groupElements = dataGroup.selectAll('g.series').data(processedData.userSeriesData);
+        const groupElements = dataGroup
+            .selectAll('g.series')
+            .data(processedData.userSeriesData);
+
         groupElements.exit().remove();
         const newGroupElements = groupElements.enter().append('g')
             .classed('series', true)
             .attr('data-userid', d => d.userId)
             .attr('data-username', d => d.userName);
+
         const newPaths = newGroupElements
             .append('path')
             .style('fill', 'none');
@@ -163,24 +161,53 @@ function buildGraph(svg, jsonData) {
         groupElements.select('path').merge(newPaths)
             .style('stroke', d => `hsl(${d.hue}, 75%, 50%)`)
             .attr('d', d => line(d.scoreHistory));
-        xAxisElement.attr('transform', `translate(0, ${svg.attr('height') - 1})`);
-        xAxis(xAxisElement);
-        yAxis(yAxisElement);
+
+        let legendGroups = legendGroup
+            .selectAll('g.legend-entry')
+            .data(processedData.userSeriesData)
+            .join('g');
+
+        legendGroups
+            .attr('transform', (d, i) => `translate(0, ${(i + 1) * 15})`)
+            .classed('legend-entry', true)
+            .append('line')
+            .attr('x1', 0)
+            .attr('x2', 10)
+            .attr('y1', -5)
+            .attr('y2', -5)
+            .attr('stroke', d => `hsl(${d.hue}, 75%, 50%)`)
+            .attr('stroke-width', targetStrokeWidth)
+
+        legendGroups
+            .append('text')
+            .attr('x', 15)
+            .text(d => d.userName)
     }
 
     update();
 
+    function updateXAxis(elem, scale) {
+        elem
+            .attr('transform', `translate(0, ${svg.attr('height') - marginBottom})`)
+            .call(xAxis.scale(scale));
+    }
+
+    function updateYAxis(elem, scale) {
+        elem
+            .attr('transform', `translate(${marginLeft}, 0)`)
+            .call(yAxis.scale(scale));
+    }
+
     const zoom = d3.zoom();
-    zoom.on("zoom", (...args) => {
-        currentXScale = d3.event.transform.rescaleX(originalXScale);
-        xAxis.scale(currentXScale);
-        xAxis(xAxisElement);
-        currentYScale = d3.event.transform.rescaleY(originalYScale);
-        yAxis.scale(currentYScale);
-        yAxis(yAxisElement);
-        update();
-        // dataGroup.attr('transform', d3.event.transform);
+    zoom.on("zoom", ({transform}) => {
+        const xs = transform.rescaleX(xScale);
+        const ys = transform.rescaleY(yScale);
+        dataGroup
+            .attr("transform", transform)
+            .attr("stroke-width", targetStrokeWidth / transform.k);
+        xAxisElement.call(updateXAxis, xs)
+        yAxisElement.call(updateYAxis, ys)
     });
-    zoom(svg);
+    svg.call(zoom).call(zoom.transform, d3.zoomIdentity);
 }
 

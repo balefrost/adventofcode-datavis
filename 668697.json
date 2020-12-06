@@ -1,0 +1,380 @@
+{
+  "members": {
+    "432061": {
+      "global_score": 0,
+      "completion_day_level": {},
+      "stars": 0,
+      "id": "432061",
+      "name": "Brendan",
+      "local_score": 0,
+      "last_star_ts": 0
+    },
+    "1124576": {
+      "global_score": 0,
+      "completion_day_level": {
+        "1": {
+          "1": {
+            "get_star_ts": "1606952096"
+          },
+          "2": {
+            "get_star_ts": "1606952289"
+          }
+        },
+        "5": {
+          "2": {
+            "get_star_ts": "1607181159"
+          },
+          "1": {
+            "get_star_ts": "1607180453"
+          }
+        },
+        "3": {
+          "2": {
+            "get_star_ts": "1607007976"
+          },
+          "1": {
+            "get_star_ts": "1607006503"
+          }
+        },
+        "6": {
+          "1": {
+            "get_star_ts": "1607266158"
+          }
+        },
+        "2": {
+          "1": {
+            "get_star_ts": "1606965648"
+          },
+          "2": {
+            "get_star_ts": "1607000728"
+          }
+        },
+        "4": {
+          "1": {
+            "get_star_ts": "1607093941"
+          },
+          "2": {
+            "get_star_ts": "1607102506"
+          }
+        }
+      },
+      "stars": 11,
+      "id": "1124576",
+      "name": "NA411",
+      "local_score": 65,
+      "last_star_ts": "1607266158"
+    },
+    "659001": {
+      "last_star_ts": "1607267567",
+      "name": "Alexander Wood",
+      "local_score": 90,
+      "completion_day_level": {
+        "2": {
+          "1": {
+            "get_star_ts": "1606917487"
+          },
+          "2": {
+            "get_star_ts": "1606917861"
+          }
+        },
+        "4": {
+          "2": {
+            "get_star_ts": "1607089811"
+          },
+          "1": {
+            "get_star_ts": "1607087933"
+          }
+        },
+        "1": {
+          "1": {
+            "get_star_ts": "1606822601"
+          },
+          "2": {
+            "get_star_ts": "1606822910"
+          }
+        },
+        "5": {
+          "2": {
+            "get_star_ts": "1607179642"
+          },
+          "1": {
+            "get_star_ts": "1607179076"
+          }
+        },
+        "3": {
+          "2": {
+            "get_star_ts": "1607005751"
+          },
+          "1": {
+            "get_star_ts": "1607005387"
+          }
+        },
+        "6": {
+          "2": {
+            "get_star_ts": "1607267567"
+          },
+          "1": {
+            "get_star_ts": "1607266714"
+          }
+        }
+      },
+      "stars": 12,
+      "global_score": 0,
+      "id": "659001"
+    },
+    "715683": {
+      "last_star_ts": 0,
+      "local_score": 0,
+      "name": "thescroll",
+      "id": "715683",
+      "completion_day_level": {},
+      "stars": 0,
+      "global_score": 0
+    },
+    "668697": {
+      "completion_day_level": {},
+      "global_score": 0,
+      "stars": 0,
+      "id": "668697",
+      "name": "adventofcode-agi",
+      "local_score": 0,
+      "last_star_ts": 0
+    },
+    "1070296": {
+      "last_star_ts": 0,
+      "local_score": 0,
+      "name": "Dylan Zeller",
+      "id": "1070296",
+      "stars": 0,
+      "completion_day_level": {},
+      "global_score": 0
+    },
+    "762967": {
+      "name": "Andres Muriel",
+      "local_score": 73,
+      "last_star_ts": "1607177707",
+      "global_score": 0,
+      "completion_day_level": {
+        "1": {
+          "1": {
+            "get_star_ts": "1606851372"
+          },
+          "2": {
+            "get_star_ts": "1606851658"
+          }
+        },
+        "3": {
+          "1": {
+            "get_star_ts": "1607006817"
+          },
+          "2": {
+            "get_star_ts": "1607007198"
+          }
+        },
+        "5": {
+          "2": {
+            "get_star_ts": "1607177707"
+          },
+          "1": {
+            "get_star_ts": "1607176683"
+          }
+        },
+        "2": {
+          "1": {
+            "get_star_ts": "1606920643"
+          },
+          "2": {
+            "get_star_ts": "1606931654"
+          }
+        },
+        "4": {
+          "2": {
+            "get_star_ts": "1607062394"
+          },
+          "1": {
+            "get_star_ts": "1607060590"
+          }
+        }
+      },
+      "stars": 10,
+      "id": "762967"
+    },
+    "704577": {
+      "completion_day_level": {},
+      "global_score": 0,
+      "stars": 0,
+      "id": "704577",
+      "name": "Ed Mackey",
+      "local_score": 0,
+      "last_star_ts": 0
+    },
+    "737062": {
+      "id": "737062",
+      "stars": 10,
+      "completion_day_level": {
+        "2": {
+          "1": {
+            "get_star_ts": "1606964402"
+          },
+          "2": {
+            "get_star_ts": "1606964734"
+          }
+        },
+        "4": {
+          "2": {
+            "get_star_ts": "1607098139"
+          },
+          "1": {
+            "get_star_ts": "1607094178"
+          }
+        },
+        "1": {
+          "1": {
+            "get_star_ts": "1606960506"
+          },
+          "2": {
+            "get_star_ts": "1606961125"
+          }
+        },
+        "5": {
+          "2": {
+            "get_star_ts": "1607183789"
+          },
+          "1": {
+            "get_star_ts": "1607183172"
+          }
+        },
+        "3": {
+          "1": {
+            "get_star_ts": "1607003935"
+          },
+          "2": {
+            "get_star_ts": "1607004752"
+          }
+        }
+      },
+      "global_score": 0,
+      "local_score": 61,
+      "name": "Dan Shookowsky",
+      "last_star_ts": "1607183789"
+    },
+    "134107": {
+      "id": "134107",
+      "completion_day_level": {
+        "2": {
+          "2": {
+            "get_star_ts": "1606886749"
+          },
+          "1": {
+            "get_star_ts": "1606886441"
+          }
+        },
+        "4": {
+          "2": {
+            "get_star_ts": "1607060630"
+          },
+          "1": {
+            "get_star_ts": "1607059301"
+          }
+        },
+        "1": {
+          "1": {
+            "get_star_ts": "1606801041"
+          },
+          "2": {
+            "get_star_ts": "1606801450"
+          }
+        },
+        "3": {
+          "2": {
+            "get_star_ts": "1606972540"
+          },
+          "1": {
+            "get_star_ts": "1606972417"
+          }
+        },
+        "5": {
+          "1": {
+            "get_star_ts": "1607179196"
+          },
+          "2": {
+            "get_star_ts": "1607179561"
+          }
+        },
+        "6": {
+          "1": {
+            "get_star_ts": "1607231260"
+          },
+          "2": {
+            "get_star_ts": "1607231385"
+          }
+        }
+      },
+      "global_score": 0,
+      "stars": 12,
+      "last_star_ts": "1607231385",
+      "local_score": 107,
+      "name": "balefrost"
+    },
+    "681251": {
+      "completion_day_level": {
+        "1": {
+          "2": {
+            "get_star_ts": "1606802356"
+          },
+          "1": {
+            "get_star_ts": "1606800863"
+          }
+        },
+        "3": {
+          "2": {
+            "get_star_ts": "1606972898"
+          },
+          "1": {
+            "get_star_ts": "1606972678"
+          }
+        },
+        "5": {
+          "1": {
+            "get_star_ts": "1607192382"
+          },
+          "2": {
+            "get_star_ts": "1607193156"
+          }
+        },
+        "6": {
+          "2": {
+            "get_star_ts": "1607237806"
+          },
+          "1": {
+            "get_star_ts": "1607237401"
+          }
+        },
+        "4": {
+          "2": {
+            "get_star_ts": "1607111729"
+          },
+          "1": {
+            "get_star_ts": "1607108595"
+          }
+        },
+        "2": {
+          "1": {
+            "get_star_ts": "1606945464"
+          },
+          "2": {
+            "get_star_ts": "1606945702"
+          }
+        }
+      },
+      "stars": 12,
+      "global_score": 0,
+      "id": "681251",
+      "name": "jk12559",
+      "local_score": 80,
+      "last_star_ts": "1607237806"
+    }
+  },
+  "event": "2020",
+  "owner_id": "668697"
+}
