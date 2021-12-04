@@ -1,8 +1,27 @@
+// These are 1-indexed, since that is how they are reported on the web site
+const ignoredDays = {
+    2018: [ 6 ],
+    2020: [ 1 ]
+};
+
 function processLeaderboardData(json) {
     const events = [];
     const eventYear = parseInt(json.event, 10);
     const baseTime = new Date(Date.UTC(eventYear, 11, 1, 5));
     const numMembers = Object.keys(json['members']).length;
+
+    const thisYearIgnoredDays = ignoredDays[eventYear] ?? [];
+
+    const ignoredStars = thisYearIgnoredDays.flatMap(dayNumber => {
+        const firstStarOfDay = (dayNumber - 1) * 2;
+        return [firstStarOfDay, firstStarOfDay + 1];
+    });
+
+    const starEvents = [];
+    for (let i = 0; i < 50; ++i) {
+        starEvents.push([]);
+    }
+
     for (const userId of Object.keys(json['members'])) {
         const userData = json.members[userId];
         const completionData = userData['completion_day_level'];
@@ -10,21 +29,61 @@ function processLeaderboardData(json) {
             const starData = completionData[dayNumberString];
             for (const starNumberString of Object.keys(starData)) {
                 const timestamp = parseInt(starData[starNumberString]['get_star_ts'], 10);
-                events.push({
+                const globalStarNumber = (parseInt(dayNumberString, 10) - 1) * 2 + parseInt(starNumberString, 10) - 1
+                let data = {
                     userId: userId,
-                    star: (parseInt(dayNumberString, 10) - 1) * 2 + parseInt(starNumberString, 10) - 1,
+                    star: globalStarNumber,
                     timestamp: new Date(timestamp * 1000)
-                });
+                };
+                events.push(data);
+
+                starEvents[globalStarNumber].push(data);
             }
         }
     }
     events.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    starEvents.forEach(se => se.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime()));
 
     const starData = [];
     for (let i = 0; i < 50; ++i) {
         starData[i] = {
             numCompleted: 0
         }
+    }
+
+    {
+        let maxTotalScore = 0;
+        let maxTotalStars = 0;
+        const userScoreHistory = new Map();
+        const maxScoreForStar = Object.keys(json.members).length;
+        starEvents.forEach((events, starNumber) => {
+            events.forEach((event, eventIndex) => {
+                let history = userScoreHistory.get(event.userId);
+                let previousScore;
+                if (!history) {
+                    history = [{
+                        timestamp: baseTime,
+                        starNumber: 0,
+                        score: 0
+                    }];
+                    userScoreHistory.set(event.userId, history);
+                    previousScore = 0;
+                } else {
+                    previousScore = history[history.length - 1].score;
+                }
+                let newScore = previousScore + (maxScoreForStar - eventIndex);
+                maxTotalScore = Math.max(maxTotalScore, newScore);
+
+                // by putting this here, we account for stars with zero activity
+                maxTotalStars = Math.max(maxTotalStars, starNumber);
+
+                history.push({
+                    timestamp: event.timestamp,
+                    starNumber: starNumber + 1,
+                    score: newScore
+                })
+            });
+        });
     }
 
     const scoreHistoriesByUserId = new Map();
@@ -68,7 +127,7 @@ function processLeaderboardData(json) {
         }
         userSeriesData.push({
             userId: k,
-            userName: json['members'][k]['name'],
+            userName: json['members'][k]['name'] ?? `(anon #${json['members'][k]['id']})`,
             scoreHistory: v,
             currentScore: currentScore
         });
@@ -96,12 +155,7 @@ function processLeaderboardData(json) {
 }
 
 function buildGraph(svg, jsonData) {
-    console.log("Oh hi!");
     const processedData = processLeaderboardData(jsonData);
-    console.log(processedData);
-    // const originalXScale = d3.scaleTime()
-    //     .domain([processedData.minTimestamp, processedData.maxTimestamp])
-    //     .range([0, svg.attr('width')]);
 
     const targetStrokeWidth = 3;
 

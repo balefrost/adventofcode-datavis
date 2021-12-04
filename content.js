@@ -1,5 +1,3 @@
-//TODO: script attempts to run in context of JSON response
-
 const followingElement = document.getElementById('ordering_info').nextElementSibling;
 const graphDescriptionNode = document.createElement('p');
 graphDescriptionNode.innerHTML = `You can view a <a href="javascript:void(0)">[Graph]</a> of the leaderboard progression.`;
@@ -19,12 +17,11 @@ graphContainerNode.appendChild(svgNode);
 let dataPromise;
 
 const toggleGraphLink = graphDescriptionNode.querySelector('a');
-toggleGraphLink.addEventListener('click', () => {
-    const isHidden = graphContainerNode.style.display === 'none';
-    const newDisplayValue = isHidden ? '' : 'none';
-    graphContainerNode.style.display = newDisplayValue;
+toggleGraphLink.addEventListener('click', async () => {
+    const wasHidden = graphContainerNode.style.display === 'none';
+    graphContainerNode.style.display = wasHidden ? '' : 'none';
 
-    if (isHidden && dataPromise == null) {
+    if (wasHidden && dataPromise == null) {
         let svg = d3.select(svgNode);
 
         const apiElement = document.querySelector('#api_info a');
@@ -32,10 +29,8 @@ toggleGraphLink.addEventListener('click', () => {
 
         dataPromise = fetch(apiUrl, { credentials: 'same-origin'});
 
-        dataPromise.then(r => {
-            r.json().then(j => {
-                buildGraph(svg, j);
-            });
-        });
+        const r = await dataPromise
+        const j = await r.json()
+        buildGraph(svg, j);
     }
 });
