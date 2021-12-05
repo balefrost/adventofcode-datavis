@@ -1,27 +1,31 @@
 // These are 1-indexed, since that is how they are reported on the web site
 const ignoredDays = {
-    2018: [ 6 ],
-    2020: [ 1 ]
+    2018: [6],
+    2020: [1]
 };
 
-function processLeaderboardData(json) {
+/**
+ * An event during which a user's score changed.
+ * @typedef { userId: string, star: number, timestamp: Date } ScoringEvent
+ */
+
+/**
+ * @typedef { timestamp: Date, starNumber: number, score: number } ScoreHistoryEntry
+ */
+
+/**
+ * @typedef { userId: string, userName: string, scoreHistory: ScoreHistoryEntry[], currentScore: number, hue: number } UserSeriesDataEntry
+ */
+
+/**
+ * Collects all the scoring events from the AoC JSON response.
+ * An event occurs when a user completes a star and gain points on the leaderboard.
+ * The events are returned in timestamp order.
+ * @param json the JSON response from the AoC website
+ * @returns [ScoringEvent] the list of events in timestamp order.
+ */
+function flattenEvents(json) {
     const events = [];
-    const eventYear = parseInt(json.event, 10);
-    const baseTime = new Date(Date.UTC(eventYear, 11, 1, 5));
-    const numMembers = Object.keys(json['members']).length;
-
-    const thisYearIgnoredDays = ignoredDays[eventYear] ?? [];
-
-    const ignoredStars = thisYearIgnoredDays.flatMap(dayNumber => {
-        const firstStarOfDay = (dayNumber - 1) * 2;
-        return [firstStarOfDay, firstStarOfDay + 1];
-    });
-
-    const starEvents = [];
-    for (let i = 0; i < 50; ++i) {
-        starEvents.push([]);
-    }
-
     for (const userId of Object.keys(json['members'])) {
         const userData = json.members[userId];
         const completionData = userData['completion_day_level'];
@@ -36,111 +40,96 @@ function processLeaderboardData(json) {
                     timestamp: new Date(timestamp * 1000)
                 };
                 events.push(data);
-
-                starEvents[globalStarNumber].push(data);
             }
         }
     }
     events.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-    starEvents.forEach(se => se.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime()));
+    return events;
+}
 
-    const starData = [];
+/**
+ * Computes the per-user score history data.
+ * @param json the JSON response from the AoC website
+ * @param ignoredStars the list of stars that are ignored from scoring
+ * @param baseTime the starting time for the specified AoC event
+ * @param {[ScoringEvent]} events the events
+ * @returns {{maxStars: number, userSeriesData: UserSeriesDataEntry[], maxScore: number}} The per-user score history
+ */
+function computeUserScores(json, ignoredStars, baseTime, events) {
+    const numMembers = Object.keys(json['members']).length;
+    const pointsRemainingByStar = [];
     for (let i = 0; i < 50; ++i) {
-        starData[i] = {
-            numCompleted: 0
-        }
+        pointsRemainingByStar[i] = ignoredStars.indexOf(((i / 2) | 0)) === -1 ? numMembers : 0;
     }
 
-    {
-        let maxTotalScore = 0;
-        let maxTotalStars = 0;
-        const userScoreHistory = new Map();
-        const maxScoreForStar = Object.keys(json.members).length;
-        starEvents.forEach((events, starNumber) => {
-            events.forEach((event, eventIndex) => {
-                let history = userScoreHistory.get(event.userId);
-                let previousScore;
-                if (!history) {
-                    history = [{
-                        timestamp: baseTime,
-                        starNumber: 0,
-                        score: 0
-                    }];
-                    userScoreHistory.set(event.userId, history);
-                    previousScore = 0;
-                } else {
-                    previousScore = history[history.length - 1].score;
-                }
-                let newScore = previousScore + (maxScoreForStar - eventIndex);
-                maxTotalScore = Math.max(maxTotalScore, newScore);
+    const userDataById = new Map();
+    const userSeriesData = [];
+    for (const userId of Object.keys(json['members'])) {
+        let data = {
+            userId: userId,
+            userName: json['members'][userId]['name'] ?? `(anon #${json['members'][userId]['id']})`,
+            scoreHistory: [{
+                timestamp: baseTime,
+                starNumber: 0,
+                score: 0
+            }],
+            currentScore: 0,
+            hue: 0
+        };
 
-                // by putting this here, we account for stars with zero activity
-                maxTotalStars = Math.max(maxTotalStars, starNumber);
-
-                history.push({
-                    timestamp: event.timestamp,
-                    starNumber: starNumber + 1,
-                    score: newScore
-                })
-            });
-        });
+        userDataById[userId] = data;
+        userSeriesData.push(data);
     }
 
-    const scoreHistoriesByUserId = new Map();
     let maxScore = 0;
     let maxStars = 0;
-    for (const event of events) {
-        let thisScoreHistory = scoreHistoriesByUserId.get(event.userId);
-        if (!thisScoreHistory) {
-            thisScoreHistory = [{
-                timestamp: baseTime,
-                score: 0
-            }];
-            scoreHistoriesByUserId.set(event.userId, thisScoreHistory);
-        }
-        let previousScore = 0;
-        if (thisScoreHistory.length > 0) {
-            previousScore = thisScoreHistory[thisScoreHistory.length - 1].score;
-        }
-        let thisStarData = starData[event.star];
-        let thisEventScore = numMembers - thisStarData.numCompleted;
-        if (eventYear === 2018) {
-            if (event.star === 10 || event.star === 11) {
-                thisEventScore = 0;
-            }
-        }
-        let updatedScore = previousScore + thisEventScore;
-        maxScore = Math.max(maxScore, updatedScore);
-        maxStars = Math.max(maxStars, thisScoreHistory.length);
-        thisScoreHistory.push({
+    for (let event of events) {
+        const userData = userDataById[event.userId];
+        const starScore = pointsRemainingByStar[event.star];
+        pointsRemainingByStar[event.star] = starScore === 0 ? 0 : starScore - 1;
+        userData.currentScore += starScore;
+        userData.scoreHistory.push({
             timestamp: event.timestamp,
-            score: updatedScore
+            starNumber: event.star,
+            score: userData.currentScore
         });
-        thisStarData.numCompleted += 1;
+        maxScore = Math.max(maxScore, userData.currentScore);
+        maxStars = Math.max(maxStars, userData.scoreHistory.length);
     }
+    return {userSeriesData, maxScore, maxStars};
+}
 
-    const userSeriesData = [];
-    for (const [k, v] of scoreHistoriesByUserId) {
-        let currentScore = 0;
-        if (v.length > 0) {
-            currentScore = v[v.length - 1].score;
-        }
-        userSeriesData.push({
-            userId: k,
-            userName: json['members'][k]['name'] ?? `(anon #${json['members'][k]['id']})`,
-            scoreHistory: v,
-            currentScore: currentScore
-        });
-    }
-
-    userSeriesData.sort((a, b) => b.currentScore - a.currentScore);
-
-    const hueDelta = 360 / scoreHistoriesByUserId.size;
+/**
+ * Assigns hue values to each element of {@link userSeriesData}.
+ *
+ * @param {UserSeriesDataEntry[]} userSeriesData
+ */
+function assignHueValues(userSeriesData) {
+    const hueDelta = 360 / userSeriesData.length;
     let currentHue = hueDelta / 2;
     userSeriesData.forEach(d => {
         d.hue = currentHue;
-        currentHue += hueDelta;
+        currentHue += (120 + hueDelta / 3);
     });
+}
+
+function processLeaderboardData(json) {
+    const eventYear = parseInt(json.event, 10);
+    const baseTime = new Date(Date.UTC(eventYear, 11, 1, 5));
+
+    const thisYearIgnoredDays = ignoredDays[eventYear] ?? [];
+
+    const ignoredStars = thisYearIgnoredDays.flatMap(dayNumber => {
+        const firstStarOfDay = (dayNumber - 1) * 2;
+        return [firstStarOfDay, firstStarOfDay + 1];
+    });
+    const events = flattenEvents(json);
+
+    let {userSeriesData, maxScore, maxStars} = computeUserScores(json, ignoredStars, baseTime, events);
+
+    userSeriesData.sort((a, b) => b.currentScore - a.currentScore);
+
+    assignHueValues(userSeriesData);
 
     return {
         minStars: 0,
