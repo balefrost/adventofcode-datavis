@@ -15,5 +15,13 @@ svg .axis path {
 }
 
 svg .data path {
-    /*stroke-width: 1.5px;*/
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+.tooltip {
+    background-color: #005500;
+    pointer-events: none;
+    padding: 3px;
+    border: 1px solid #ccc;
 }

@@ -109,7 +109,7 @@ function assignHueValues(userSeriesData) {
     let currentHue = hueDelta / 2;
     userSeriesData.forEach(d => {
         d.hue = currentHue;
-        currentHue += (120 + hueDelta / 3);
+        currentHue += (360 / 4 + hueDelta / 4);
     });
 }
 
@@ -143,10 +143,10 @@ function processLeaderboardData(json) {
     };
 }
 
-function buildGraph(svg, jsonData) {
+function buildGraph(svg, tooltip, jsonData) {
     const processedData = processLeaderboardData(jsonData);
 
-    const targetStrokeWidth = 3;
+    const targetStrokeWidth = 5;
 
     const marginLeft = 25;
     const marginBottom = 20;
@@ -203,7 +203,22 @@ function buildGraph(svg, jsonData) {
 
         groupElements.select('path').merge(newPaths)
             .style('stroke', d => `hsl(${d.hue}, 75%, 50%)`)
-            .attr('d', d => line(d.scoreHistory));
+            .attr('d', d => line(d.scoreHistory))
+            .on('mouseenter', (evt, d) => {
+                tooltip.text(d.userName);
+                tooltip.style('display', '');
+                let { width: ttWidth } = tooltip.node().getBoundingClientRect();
+                tooltip.style('left', `${evt.pageX - ttWidth - 3}px`);
+                tooltip.style('top', `${evt.pageY}px`);
+            })
+            .on('mousemove', (evt) => {
+                let { width: ttWidth } = tooltip.node().getBoundingClientRect();
+                tooltip.style('left', `${evt.pageX - ttWidth - 3}px`);
+                tooltip.style('top', `${evt.pageY}px`);
+            })
+            .on('mouseleave', () => {
+                tooltip.style('display', 'none');
+            });
 
         let legendGroups = legendGroup
             .selectAll('g.legend-entry')

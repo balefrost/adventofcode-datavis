@@ -3,6 +3,11 @@ const graphDescriptionNode = document.createElement('p');
 graphDescriptionNode.innerHTML = `You can view a <a href="javascript:void(0)">[Graph]</a> of the leaderboard progression.`;
 followingElement.parentElement.insertBefore(graphDescriptionNode, followingElement);
 const graphContainerNode = document.createElement('div');
+let tooltipNode = document.createElement('div');
+tooltipNode.classList.add('tooltip');
+tooltipNode.style.display = 'none';
+tooltipNode.style.position = 'absolute';
+graphContainerNode.appendChild(tooltipNode);
 graphContainerNode.style.display = "none";
 followingElement.parentElement.insertBefore(graphContainerNode, followingElement);
 const svgNS = 'http://www.w3.org/2000/svg';
@@ -31,6 +36,6 @@ toggleGraphLink.addEventListener('click', async () => {
 
         const r = await dataPromise
         const j = await r.json()
-        buildGraph(svg, j);
+        buildGraph(svg, d3.select(tooltipNode), j);
     }
 });

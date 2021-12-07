@@ -1,4 +1,4 @@
-const pageReady = new Promise((resolve, reject) => {
+const pageReady = new Promise((resolve) => {
     if (document.readyState === 'loading') {
         let listener = () => {
             if (document.readyState !== 'loading') {
@@ -12,12 +12,11 @@ const pageReady = new Promise((resolve, reject) => {
     }
 });
 
-pageReady.then(() => {
+pageReady.then(async () => {
     let graph = document.getElementById('graph');
     let svg = d3.select(graph);
-    fetch('668697.json').then(r => {
-        r.json().then(j => {
-            buildGraph(svg, j);
-        });
-    });
+    let tooltipNode = d3.select(document.getElementById('tooltip'));
+    const r = await fetch('371953.json');
+    const j = await r.json()
+    buildGraph(svg, tooltipNode, j);
 });
