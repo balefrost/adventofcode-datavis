@@ -18,6 +18,8 @@ Still here? OK, here's how you can install this into Chrome:
 
 ## Load the code as an unpacked extension
 
+You want to pick the directory that contains the manifest.json file. In my case, I have a `C:\src\adventofcode-datavis\manifest.json`, so I pick `C:\src\adventofcode-datavis`. 
+
 ![](images/step4.png)
 
 ## Click the new "Graph" link in your private leaderboard's page
